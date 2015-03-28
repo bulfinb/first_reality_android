@@ -1,0 +1,7 @@
+dragon1
+1
+90
+7
+5
+306/70
+Lred_dragon.png

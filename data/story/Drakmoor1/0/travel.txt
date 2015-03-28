@@ -1,0 +1,6 @@
+icon.png
+10/360
+Dukedum6
+Glowing stone
+wind.ogg/0
+Self_W.png/Norman travels west to the Dukedom/The road is long and boring

@@ -1,0 +1,6 @@
+icon.png
+847/508
+Drakmoor0
+Glowing stone
+wind.ogg/0
+Self_E.png/Norman travels east to the fearsome lands of Drakmoor.

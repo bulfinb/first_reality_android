@@ -1,0 +1,9 @@
+Behemoth
+1
+210
+4
+3
+300/600
+behemoth.png
+Ruins2
+behemoth.ogg

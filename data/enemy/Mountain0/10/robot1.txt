@@ -1,0 +1,7 @@
+dragon1
+1
+190
+4
+6
+32/650
+robotboss.png

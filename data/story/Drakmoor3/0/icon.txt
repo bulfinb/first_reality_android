@@ -1,0 +1,6 @@
+icon.png
+30/350
+Dukedum5
+Glowing stone
+wind.ogg/0
+Self_W.png/Norman travels west back to the Dukedom

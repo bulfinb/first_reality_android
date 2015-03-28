@@ -1,0 +1,7 @@
+dragon1
+1
+100
+7
+5
+560/232
+skeleton.png

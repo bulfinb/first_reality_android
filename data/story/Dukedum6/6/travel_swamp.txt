@@ -1,0 +1,6 @@
+icon.png
+10/508
+Swamp0
+Glowing stone
+wind.ogg/0
+Self_W.png/Norman travels west to the Swamp.... The road is long and dreary.

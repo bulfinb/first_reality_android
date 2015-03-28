@@ -1,0 +1,7 @@
+dragon1
+1
+250
+10
+8
+850/450
+princess.png

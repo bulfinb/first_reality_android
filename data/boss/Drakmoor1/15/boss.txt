@@ -1,0 +1,9 @@
+Siefer
+1
+130
+3
+3
+300/300
+soldier.png
+Ruins0
+karate.ogg

@@ -1,0 +1,6 @@
+text.png
+558/220
+Drakmoor1
+Temple key/Norman: ...."Looks like I need a key. In my experience, its usually further down the path."
+wind.ogg/30
+Temple.jpg/The door opens slowly. A stale smelling gust of wind sweeps out. /Norman: ..."It smells like a crusty old man."

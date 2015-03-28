@@ -1,0 +1,7 @@
+dragon1
+1
+80
+7
+6
+250/180
+scorpian.png

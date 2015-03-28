@@ -1,0 +1,9 @@
+Siefer
+1
+500
+12
+6
+400/100
+soldier.png
+Tower2
+karate.ogg

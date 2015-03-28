@@ -1,0 +1,7 @@
+dragon1
+1
+45
+3
+6
+100/100
+blue_dragon.png

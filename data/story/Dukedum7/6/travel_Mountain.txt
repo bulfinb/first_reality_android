@@ -1,0 +1,6 @@
+icon.png
+10/108
+Mountain0
+Glowing stone
+wind.ogg/0
+Self_W.png/Norman travels north west to the cold mountain.... The road is long and dreary.
