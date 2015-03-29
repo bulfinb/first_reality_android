@@ -14,6 +14,10 @@ try:
 except ImportError:
     android = None
 
+try:
+    import pygame.mixer as mixer
+except ImportError:
+    import mixer
 # used for game menu, battle menu, dialogue options etc.
 
 
@@ -93,7 +97,9 @@ class Exit_Menu(Menu):
         while g.exit_menu_on is True:
             if android:
                 if android.check_pause():
+                    mixer.music.pause()
                     android.wait_for_resume()
+                    mixer.music.unpause()
             # Menu Loop
             # passes choices and menu position to menu control
             text = Blitted_rect((270, 105), (g.xsize/2 - 145, g.ysize/2-45), self.color)
@@ -342,6 +348,11 @@ class Intro_Menu(Menu):
         wait(self, 2000)
         self.investigate = False
         while self.menu_on is True:
+            if android:
+                if android.check_pause():
+                    mixer.music.pause()
+                    android.wait_for_resume()
+                    mixer.music.unpause()
             # Menu Loop
             # passes choices and menu position to menu control
             #self.back_rect.center = (g.xsize/2, g.ysize/2+(g.ysize-500)/2)

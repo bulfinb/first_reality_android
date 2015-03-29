@@ -1,5 +1,6 @@
 import pygame.image
 import os
+import globals as g
 from constants import direction
 """functions for parsing text files used for various game objects
 Including npc's enemies chests and hopefully map files too   """
@@ -154,7 +155,9 @@ def load_jpg(filename):
 
 
 def play_music(filename, time, volume):
+    g.current_song = os.path.join('data', 'music', filename)
     mixer.music.load(os.path.join('data', 'music', filename))
     mixer.music.set_volume(volume)
     mixer.music.play(-1)
+    mixer.music.queue(os.path.join('data', 'music', filename))
 

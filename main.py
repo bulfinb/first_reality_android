@@ -45,9 +45,11 @@ while True:
     if next_update_time < time:
         if android:
             if android.check_pause():
+                mixer.music.pause()
                 android.wait_for_resume()
-            elif mixer.music.get_busy() == False and g.boss_defeated == False and world.name != 'Tower0':
-                mixer.music.play(-1)
+                mixer.music.unpause()
+#            elif mixer.music.get_busy() == False and g.boss_defeated == False and world.name != 'Tower0':
+#                mixer.music.play(-1)
         next_update_time = time + 30
         control_events(myplayer, world, inter_objects.objects)
         world.change_rooms(myplayer, time, g.ysize, g.xsize)

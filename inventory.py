@@ -14,6 +14,10 @@ try:
 except ImportError:
     android = None
 
+try:
+    import pygame.mixer as mixer
+except ImportError:
+    import mixer
 
 class Item(object):
 
@@ -635,7 +639,9 @@ class Inventory_Menu(Menu):
         while player.menu:
             if android:
                 if android.check_pause():
+                    mixer.music.pause()
                     android.wait_for_resume()
+                    mixer.music.unpause()
             """Menu Loop"""
             time = pygame.time.get_ticks()
             self.blit_backround(inventory, area)

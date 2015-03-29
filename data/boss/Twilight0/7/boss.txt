@@ -4,6 +4,6 @@ Self
 3
 3
 300/300
-self.png
+Self_B.png
 Twilight1
 self.ogg
