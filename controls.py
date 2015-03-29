@@ -10,6 +10,10 @@ try:
 except ImportError:
     android = None
 
+try:
+    import pygame.mixer as mixer
+except ImportError:
+    import mixer
 
 def control_events(p, amap, interobjects):
     # Controls the player checks what buttons were pressed and sets the
@@ -64,7 +68,9 @@ def space_loop(p):
     while p.investigate is False:
         if android:
             if android.check_pause():
+                mixer.music.pause()
                 android.wait_for_resume()
+                mixer.music.unpause()
         pygame.time.wait(50)
         pygame.display.update()
         for event in pygame.event.get():
@@ -83,6 +89,11 @@ def wait(player, time):
     for i in range(0, time/100):
         pygame.time.wait(100)
         control_events_menu(player, g.xsize, g.ysize)
+    if android:
+        if android.check_pause():
+            mixer.music.pause()
+            android.wait_for_resume()
+            mixer.music.unpause()
 
 
 def control_player(player, inter_objects, amap, current_time):
