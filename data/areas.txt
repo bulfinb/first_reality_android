@@ -1,3 +1,6 @@
+Tower1
+Drakmoor1
+Dukedum1
 Dukedum6
 Dukedum0
 Dukedum4
@@ -7,8 +10,6 @@ Twilight0
 Twilight1
 Tower0
 Dukedum11
-Dukedum1
-Drakmoor1
 Dukedum10
 Swamp0
 Dukedum7
@@ -16,7 +17,6 @@ Tower2
 Mountain0
 Dukedum5
 Ruins0
-Tower1
 Dukedum8
 Drakmoor2
 Ruins2
