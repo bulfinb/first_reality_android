@@ -3,7 +3,7 @@ import globals as g
 from pygame.locals import *
 from constants import *
 from text_box import TextBox
-from collisions import collision_map, collision_ob, collision_room, track_mouse, track_mouse_menu
+from collisions import collision_map, collision_ob, collision_room, track_mouse, track_mouse_menu, face_mouse
 try:
     import android
     android.init()
@@ -22,7 +22,8 @@ def control_events(p, amap, interobjects):
         if event.type == pygame.QUIT:
             exit()
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            if event.button == 1 and abs(p.rect.center[0]-event.pos[0]) < 100 and abs(p.rect.center[1] - event.pos[1]) < 100:
+            if event.button == 1 and abs(p.rect.center[0]-event.pos[0]) < 150 and abs(p.rect.center[1] - event.pos[1]) < 150:
+                face_mouse(p, event.pos)
                 p.investigate = True
                 g.mouse_position = event.pos
         if event.type == pygame.MOUSEMOTION:

@@ -5,7 +5,7 @@ import globals as g
 from constants import *
 from text_box import TextBox
 from sounds import (attack, openc, damage, enemy_dead, ability,
-                    levelup, boss_defeated, boss_victory, explosion)
+                    levelup, boss_defeated, boss_victory, explosion, buckfast)
 from parse import (
     load_npc_array,
     load_text_array,
@@ -182,7 +182,7 @@ class Npc(object):
         self.rect.top = area.rect.top + \
             self.starting_position[1]    # place y
 
-    def interact(self, area, player):
+    def interact(self, area, player, inventory):
         # sets what happens when an npc is interacted with
         # first we set the npc to face our player using the players position
         # from the interact objects function
@@ -219,6 +219,14 @@ class Npc(object):
             # Loops on each dialogue entry until the player presses space bar
             space_loop(player)
         # after space loop need to reset player.investigate
+        if self.name == 'well':
+            buckfast.play()
+            inventory.health[0] = inventory.health[1]
+            text = TextBox(
+            (165, 42), (410, 100), (20, 20, 200), fonts[0], 24)  # Display Game Saved!
+            text.setText('HP Restored')
+            pygame.display.update()     # Blit Game Saved
+            wait(player, 800)
         player.investigate = False
         player.going = False
 
@@ -349,14 +357,16 @@ class Chest(object):
             g.screen.blit(self.image, self.rect)  # blits open box
             g.screen.blit(player.image, player.rect)
             dim(120)  # DIm the screen
+            player.investigate = False
+            player.going = False
             # vary the position of the conversation boxes
             boxposx = g.xsize/6+randint(0, 1)*(g.xsize-(200+2*g.xsize/6))
             boxposy = g.ysize/6+randint(0, 1)*(g.ysize-(45 + 2*g.ysize/6))  # same
             text = TextBox((200, 45), (boxposx, boxposy), BLUE, fonts[2], 22)
             text.setText(self.contents)
+            space_loop(player)
             player.investigate = False
             player.going = False
-            space_loop(player)
             # update the inventory
             inventory.update_inventory(self.contents)
 
@@ -775,7 +785,7 @@ class Interactable_Objects(object):
         for enemy in self.enemies:
                 # first check if player is close to an enemy and if that object is an enemy
             if proximity(player, enemy, 15):
-                if (player.investigate and current_time > self.next_fight_time
+                if (current_time > self.next_fight_time
                    and fight_enemy(player, enemy)):
                     self.next_fight_time = current_time + 24*inventory.stats[5].quantity
                     # damages the enemy
@@ -806,10 +816,10 @@ class Interactable_Objects(object):
     def ability_fight(self, area, player, inventory, current_time):
         """Fight using ability. Only works when no enemies are in Melee range.
         Can hit multiple enemies"""
-        if self.fighting is False and current_time > self.next_fight_time and player.investigate:
+        if self.fighting is False and current_time > self.next_fight_time and player.investigate is True:
             self.hit_enemies = []
             for enemy in self.enemies:
-                if proximity(player, enemy, 15+5+inventory.ability.power*7):
+                if proximity(player, enemy, 15+3+inventory.ability.power*9):
                     self.next_fight_time = current_time + 24*inventory.stats[5].quantity
                     self.ability_animate_time = current_time + 600
                     self.hit_enemies.append(enemy)
@@ -858,14 +868,14 @@ class Interactable_Objects(object):
 
             for npc in self.npcs:
                 if talk_npc(player, npc):
-                    npc.interact(area, player)
+                    npc.interact(area, player, inventory)
 
             for chest in self.chests:
                 if open_chest(player, chest):
                     chest.interact(area, inventory, player)
 
             for story in self.stories:
-                if proximity(player, story, 15) and abs(g.mouse_position[0] - story.rect.center[0]) < 74 and abs(g.mouse_position[1] - story.rect.center[1]) < 74:
+                if talk_npc(player, story):
                     player.going = False
                     story.interact(area, player, inventory)
 

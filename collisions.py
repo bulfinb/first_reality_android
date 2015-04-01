@@ -15,20 +15,9 @@ def proximity(ob1, ob2, distance):
 
 def talk_npc(player, npc):
     # if player is close to the npc check
-    if proximity(player, npc, 14) is True and abs(g.mouse_position[0] - npc.rect.center[0]) < 74 and abs(g.mouse_position[1] - npc.rect.center[1]) < 74:
+    if proximity(player, npc, 30) is True and abs(g.mouse_position[0] - npc.rect.center[0]) < 94 and abs(g.mouse_position[1] - npc.rect.center[1]) < 94:
         # if ist below on the right or left and if its facing the npc return True
-        if player.rect.center[1]+20-npc.rect.bottom > 0 and player.facing == u:
-            player.position = d
-            return True
-        elif npc.rect.left + 20 - player.rect.left > 0 and player.facing == r:
-            player.position = l
-            return True
-        elif player.rect.right - npc.rect.right > 0 and player.facing == l:
-            player.position = r
-            return True
-        elif npc.rect.top + 20 - player.rect.bottom > 0 and player.facing == d:
-            player.position = u
-            return True
+        return True
 
 
 def fight_enemy(player, npc):
@@ -136,10 +125,16 @@ def collision_map(ob, room, gap):
 
 def collision_door(player, door, room, gap):
     # detects if a player walks through a door
-    if ((player.going == door[3] or player.facing == door[3])
-       and door[1] - gap < player.rect.center[0] - room.rect.left < door[1] + gap
-       and door[2] - gap < player.rect.center[1] - room.rect.top < door[2] + gap):
-        return True
+    if door[3] == u or door[3] == d:
+        if ((player.going == door[3] or player.facing == door[3])
+           and door[1] - 2*gap < player.rect.center[0] - room.rect.left < door[1] + 2*gap
+           and door[2] - gap < player.rect.center[1] - room.rect.top < door[2] + gap):
+            return True
+    elif door[3] == l or door[3] == r:
+        if ((player.going == door[3] or player.facing == door[3])
+           and door[1] - gap < player.rect.center[0] - room.rect.left < door[1] + gap
+           and door[2] - 2*gap < player.rect.center[1] - room.rect.top < door[2] + 2*gap):
+            return True
 
 
 def track(enemy, player):
@@ -171,9 +166,20 @@ def track_mouse(player, mouse_pos):
             player.facing = d
         else:
             player.going = False
-
     else:
         player.going = False
+
+
+def face_mouse(player, mouse_pos):
+    sep = [- player.rect.center[0] + mouse_pos[0], - player.rect.center[1] + mouse_pos[1]]
+    if abs(sep[0]) >= abs(sep[1]) and sep[0] > 0:
+        player.facing = r
+    elif abs(sep[1]) > abs(sep[0]) and sep[1] < 0:
+        player.facing = u
+    elif abs(sep[0]) >= abs(sep[1]) and sep[0] < 0:
+        player.facing = l
+    elif abs(sep[1]) > abs(sep[0]) and sep[1] > 0:
+        player.facing = d
 
 
 def track_mouse_menu(player, mouse_pos):

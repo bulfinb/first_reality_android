@@ -1,3 +1,4 @@
+# Copyright 2015, Brendan Bulfin
 import pygame
 import os
 import globals as g
