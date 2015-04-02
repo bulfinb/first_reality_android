@@ -159,5 +159,7 @@ def play_music(filename, time, volume):
     mixer.music.load(os.path.join('data', 'music', filename))
     mixer.music.set_volume(volume)
     mixer.music.play(-1)
-    mixer.music.queue(os.path.join('data', 'music', filename))
+    if g.current_area != 'Tower0':
+        mixer.music.queue(os.path.join('data', 'music', filename))
+        mixer.music.queue(os.path.join('data', 'music', filename))
 

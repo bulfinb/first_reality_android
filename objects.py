@@ -36,6 +36,8 @@ exit_menu = Exit_Menu(BLACK)
 """Thisa file contains the classes for npcs chests enemies and other objects
 wich are all loaded into the class objects which is a list of sprites that the
 player can interact with. It also loads up all the sound effects"""
+
+
 class Player(object):
 
     """Player class. used to update and animate the player"""
@@ -44,36 +46,36 @@ class Player(object):
         self.images = [
             load_png(
                 os.path.join('data',
-                    'player', 'sidef.png')), load_png(
+                             'player', 'sidef.png')), load_png(
                 os.path.join('data',
-                    'player', 'sidef_r1.png')), load_png(
+                             'player', 'sidef_r1.png')), load_png(
                 os.path.join('data',
-                    'player', 'sidef_r2.png')), load_png(
+                             'player', 'sidef_r2.png')), load_png(
                 os.path.join('data',
-                    'player', 'sideb.png')), load_png(
+                             'player', 'sideb.png')), load_png(
                 os.path.join('data',
-                    'player', 'sideb_r1.png')), load_png(
+                             'player', 'sideb_r1.png')), load_png(
                 os.path.join('data',
-                    'player', 'sideb_r2.png')), load_png(
+                             'player', 'sideb_r2.png')), load_png(
                 os.path.join('data',
-                    'player', 'sider.png')), load_png(
+                             'player', 'sider.png')), load_png(
                 os.path.join('data',
-                    'player', 'sider1.png')), load_png(
+                             'player', 'sider1.png')), load_png(
                 os.path.join('data',
-                    'player', 'sidel.png')), load_png(
+                             'player', 'sidel.png')), load_png(
                 os.path.join('data',
-                    'player', 'sidel1.png'))]
+                             'player', 'sidel1.png'))]
         # sword images
         self.attack_images = [
             load_png(
                 os.path.join('data',
-                    'player', 'cut.png')), load_png(
+                             'player', 'cut.png')), load_png(
                 os.path.join('data',
-                    'player', 'cutr.png')), load_png(
+                             'player', 'cutr.png')), load_png(
                 os.path.join('data',
-                    'player', 'cutd.png')), load_png(
+                             'player', 'cutd.png')), load_png(
                 os.path.join('data',
-                    'player', 'cutl.png'))]
+                             'player', 'cutl.png'))]
         self.image = self.images[0]
         self.attack_image = self.attack_images[0]  # sword image
         self.attack_rect = self.attack_image.get_rect()
@@ -174,7 +176,15 @@ class Npc(object):
         self.starting_position = array[4]   # sets starting position
         self.dialogue = array[5]
         # Load up the images of the npc
-        self.images = load_tile_table(os.path.join('data', 'npc', 'images', self.name + '.png'), 3, 4)
+        self.images = load_tile_table(
+            os.path.join(
+                'data',
+                'npc',
+                'images',
+                self.name +
+                '.png'),
+            3,
+            4)
         self.image = self.images[1][self.facing]  # picks the facing down image
         self.rect = self.image.get_rect()  # get the rectangle
         self.rect.left = area.rect.left + \
@@ -223,7 +233,7 @@ class Npc(object):
             buckfast.play()
             inventory.health[0] = inventory.health[1]
             text = TextBox(
-            (165, 42), (410, 100), (20, 20, 200), fonts[0], 24)  # Display Game Saved!
+                (165, 42), (410, 100), (20, 20, 200), fonts[0], 24)  # Display Game Saved!
             text.setText('HP Restored')
             pygame.display.update()     # Blit Game Saved
             wait(player, 800)
@@ -236,7 +246,7 @@ class Npc(object):
         if self.moving:
             # check collisions with maps
             if (self.going
-                and (collision_room(self, area, 10) or collision_map(self, area, 10))):
+                    and (collision_room(self, area, 10) or collision_map(self, area, 10))):
                 self.going = False
             # next check for collisions with objects
             elif self.going:
@@ -391,6 +401,8 @@ class Enemy(object):
         self.image = None                 # The enemy current image
         self.rect = None                  # The enemy rect
         self.next_update_time = 100*randint(0, 4)+30*randint(0, 3)
+        self.go_around = False
+        self.store = False
         # loads enemys of to the starting room
 
     def load(self, area, array):
@@ -412,21 +424,46 @@ class Enemy(object):
         self.rect.top = area.rect.top + \
             self.starting_position[1]    # place y
 
+    def try_go_around(self, current_time):
+        if self.going == r:
+            self.going = up_down[randint(0, 1)]
+            self.store = r
+        elif self.going == l:
+            self.going = up_down[randint(0, 1)]
+            self.store = l
+        elif self.going == d:
+            self.going = left_right[randint(0, 1)]
+            self.store = d
+        elif self.going == u:
+            self.going = left_right[randint(0, 1)]
+            self.store = u
+
+        self.next_update_time = current_time + 4000/self.speed
+
     def update(self, area, objects, player, current_time):
             # updates moving npcs
         if self.moving:
             # check collisions with maps
-            if (self.going
-                 and (collision_room(self, area, 10) or collision_map(self, area, 10))):
-                self.going = randint(1,4)
+            if (self.going and collision_room(self, area, 10)):
+                self.going = False
             # next check for collisions with objects
             elif self.going:
-                for a in objects:
-                    if collision_ob(self, a, 12):
-                        self.going = randint(1,4)
-                        break
-                if collision_ob(self, player, 12):
+                if collision_map(self, area, 10) and self.go_around == False:
+                    self.try_go_around(current_time)
+
+                elif collision_map(self, area, 10):
                     self.going = False
+
+                else:
+                    for a in objects:
+                        if collision_ob(self, a, 12):
+                            if self.go_around == False:
+                                self.try_go_around(current_time)
+                                break
+                            else:
+                                self.going = False
+                    if collision_ob(self, player, 12):
+                        self.going = False
             # function to control sprite switching, movement and collisions
             control_ob(
                 self,
@@ -436,10 +473,16 @@ class Enemy(object):
                 current_time)
             # randomly selects movement direction every 2 seconds.
             # if not moving then it randomly selects a facing direction
+            if self.go_around and self.next_update_time < current_time:
+                self.go_around = True
+                self.going = self.store
+                self.next_update_time = current_time + 4000/self.speed
+
             if self.next_update_time < current_time:
+                self.go_around = False
                 track(self, player)
                 self.facing = self.going
-                self.next_update_time = current_time + 1200/self.speed
+                self.next_update_time = current_time + 2000/self.speed
                 # seperates times at which npc randomly decide to move by 0.4
                 # seconds
 
@@ -499,7 +542,13 @@ class story_object(object):
         self.dialogues = []
         for i in range(5, len(array)):
             # Load up story line images and names
-            self.background_images.append(load_jpg(os.path.join('data', 'story', 'images', array[i][0])))
+            self.background_images.append(
+                load_jpg(
+                    os.path.join(
+                        'data',
+                        'story',
+                        'images',
+                        array[i][0])))
             self.background_rects.append(self.background_images[i-5].get_rect())
             array[i].pop(0)
             self.dialogues.append(array[i])
@@ -511,6 +560,11 @@ class story_object(object):
                 if accessory.name == 'Wedding ring':
                     accessory.power = -3
                     inventory.update_equipment()
+        elif self.keyitem == 'Glowing stone':
+            for accessory in inventory.accessories:
+                if accessory.name == 'Wedding ring':
+                    if accessory.power == -3:
+                        inventory.moneys = 0
 
     def interact(self, area, player, inventory):
         """This cycles through images and text to further the storyline the player posses
@@ -530,11 +584,13 @@ class story_object(object):
                 fade_out(1500)
                 play_music(self.song[0], self.song[1], 0.7)
 
-            for i in range(0,len(self.background_images)):
+            for i in range(0, len(self.background_images)):
                 if 9*self.background_rects[i].height > 10*g.ysize + 1:
-                    self.background_images[i] = pygame.transform.scale(self.background_images[i],
-                                                                       (14*self.background_rects[i].width*g.ysize/(13*self.background_rects[i].height),
-                                                                        14*self.background_rects[i].height*g.ysize/(13*self.background_rects[i].height)))
+                    self.background_images[i] = pygame.transform.scale(
+                        self.background_images[i],
+                        (14 * self.background_rects[i].width * g.ysize
+                         / (13 * self.background_rects[i].height), 14 * self.background_rects
+                         [i].height * g.ysize / (13 * self.background_rects[i].height)))
                     self.background_rects[i] = self.background_images[i].get_rect()
 
             for i in range(0, len(self.background_images)):
@@ -604,7 +660,8 @@ class Boss(Enemy):
     def load(self, area, array):
         Enemy.load(self, area, array)
         self.new_area = array[7][0]
-        self.sound = mixer.Sound(os.path.join('data', 'sounds',array[8][0]))
+        self.sound = mixer.Sound(os.path.join('data', 'sounds', array[8][0]))
+
     def update(self, area, objects, player, current_time):
         Enemy.update(self, area, objects, player, current_time)
 
@@ -627,9 +684,9 @@ class Boss(Enemy):
         if current_time > self.next_spawn_time and self.spawn not in interobjects.enemies:
             self.next_spawn_time = current_time + 15000
             self.spawn.health = self.spawn_health
-            self.spawn.rect.center = (self.rect.center[0]+
+            self.spawn.rect.center = (self.rect.center[0] +
                                       (player.rect.center[0]-self.rect.center[0])/2,
-                                       self.rect.center[1]+
+                                      self.rect.center[1] +
                                       (player.rect.center[1]-self.rect.center[1])/2)
             interobjects.objects.append(self.spawn)
             interobjects.enemies.append(self.spawn)
@@ -737,7 +794,7 @@ class Interactable_Objects(object):
     def load_Enemies(self, area):
         """LOad up the enemies in the current room"""
         enemys = {}
-        for root, dirs, files in os.walk(os.path.join('data' ,'enemy', area.name, str(area.current_room))):
+        for root, dirs, files in os.walk(os.path.join('data', 'enemy', area.name, str(area.current_room))):
             for name in files:
                 filename = os.path.join(root, name)
                 if str(filename).find("txt") != -1:
@@ -921,7 +978,12 @@ class Interactable_Objects(object):
 # can possiby write an os.walk method for producing this list when the
 # game is started
 # only 2 images so permanently load them
-chest_images = [load_png(os.path.join('data' , 'chest.png')), load_png(os.path.join('data', 'chest_open.png'))]
+chest_images = [
+    load_png(
+        os.path.join(
+            'data', 'chest.png')), load_png(
+        os.path.join(
+            'data', 'chest_open.png'))]
 text_image = load_png(os.path.join('data', 'text.png'))
 damage_image = load_png(os.path.join('data', 'enemy', 'images', 'damage.png'))
 damage_rect = damage_image.get_rect()

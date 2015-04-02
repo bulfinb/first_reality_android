@@ -4,4 +4,4 @@ dragon1
 7
 6
 250/180
-scorpian.png
+robot2.png

@@ -1,7 +1,7 @@
 dragon1
 1
-90
+350
 7
 5
-306/140
-hippo.png
+586/400
+swampm.png

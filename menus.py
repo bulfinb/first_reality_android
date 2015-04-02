@@ -291,7 +291,8 @@ class Intro_Menu(Menu):
         self.blit_credits('Main Artists', ['Aoife Bulfin', 'Aveen Bulfin', 'Brendan Bulfin', 'Finn Nichol'], 300)
         self.blit_credits('Other Artists', ['Hugh Bulfin', 'Matilda Guffog'], 270)
         self.blit_credits('Other Artists', ['Dan Kirby', 'Kieran Brennan', 'Daniela Carta'], 270)
-        self.blit_credits('NPC and Enemy Sprites', ['RPG Maker XV'], 270)
+        self.blit_credits('Sprite Art', ['Brendan Bulfin'], 270)
+        self.blit_credits('SFX Editor', ['James Garvey'], 270)
 
 
         self.blit_credits('Self Quotes', ['Cormac Mc Carthy', 'Mary Shelly', 'Dr. Zeus','' ], 280)
@@ -392,6 +393,7 @@ class Intro_Menu(Menu):
                     player.rect.topleft = [g.xsize/2, g.ysize/2]
                     world.load_all()
                     inventory.load_game()
+                    select.play()
                     world.current_area = pickle.load(
                         open(
                             os.path.join(
@@ -409,7 +411,6 @@ class Intro_Menu(Menu):
                     world.room_change = True
                     self.menu_on = False
                     g.mouse = False
-                    select.play()
                 except:
                     damage.play()
 

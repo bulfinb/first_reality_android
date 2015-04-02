@@ -46,6 +46,7 @@ class Area_map(pygame.sprite.Sprite):
         self.current_room = self.area_data[1]
         self.player_pos = self.area_data[2]
         self.song = self.area_data[3]
+        g.current_area = self.name
         if self.song[0] == 'None':
             fade_black(1500)
         else:

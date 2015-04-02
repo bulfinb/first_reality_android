@@ -3,5 +3,5 @@ dragon1
 37
 4
 5
-550/480
+550/440
 redplant.png

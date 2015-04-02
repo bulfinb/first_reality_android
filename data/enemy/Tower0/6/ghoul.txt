@@ -1,7 +1,7 @@
 dragon1
 1
-70
+150
 7
 5
 306/140
-ghoul.png
+bat.png

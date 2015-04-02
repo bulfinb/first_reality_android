@@ -3,5 +3,5 @@ dragon1
 25
 1
 2
-810/50
+740/50
 marvin.png

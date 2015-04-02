@@ -1,7 +1,7 @@
 hippo
 1
-150
+350
 10
-1
-150/400
-hippo.png
+6
+150/380
+swampm.png

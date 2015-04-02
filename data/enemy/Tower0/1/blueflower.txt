@@ -1,7 +1,7 @@
 dragon1
 1
-80
+110
 7
 5
 830/450
-bee.png
+beeL.png

@@ -4,4 +4,4 @@ dragon1
 4
 6
 450/500
-yellow_dragon.png
+dragon.png

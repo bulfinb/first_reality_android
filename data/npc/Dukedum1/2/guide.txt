@@ -3,4 +3,4 @@ guide
 0
 2
 180/540
-Helpful Dan: When you're fighting you can use long and short range attacks. / Your abilities are long range attacks. Normal attacks are short range. / Abilities only work if no enemies are within normal attack range. / To use a normal attack approach an enemy and tap them./ To use an ability tap norman while an enemy is within ability range./ Using abilities means you avoid taking damage. Different abilities have different attack ranges. / Use the menu button to open the menu. I recommend exploring it.
+Helpful Dan: When you're fighting you can use long and short range attacks. / Your abilities are long range attacks. Normal attacks are short range. / Abilities only work if no enemies are within normal attack range. / To use a normal attack approach an enemy and Norman will attack./ To use an ability tap Norman while an enemy is within ability range./ Using abilities means you avoid taking damage. Different abilities have different attack ranges. / Use the menu button to open the menu. I recommend exploring it.

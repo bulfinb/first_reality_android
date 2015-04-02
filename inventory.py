@@ -376,7 +376,7 @@ class Inventory(object):
                 break
 
     def level_up(self):
-        if self.exp <= 0:
+        if self.exp <= 0 and self.counter <= 10:
             self.counter += 1
             self.exp = 30 + 50*self.counter + 5*self.counter ^ 2
             self.stats[0].quantity += 1
