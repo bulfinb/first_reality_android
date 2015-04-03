@@ -1,9 +1,9 @@
 Seifer
 1
-500
+650
 12
 6
-400/100
+100/600
 soldier.png
 Tower2
 karate.ogg

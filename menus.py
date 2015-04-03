@@ -267,7 +267,6 @@ class Intro_Menu(Menu):
         wait(self,4000)
         wait(self, 3000)
         mixer.music.load(os.path.join('data', 'music', 'credits.ogg'))
-        mixer.music.set_volume(volume)
         mixer.music.play(0)
         wait(self,18000)
         fade_black(3000)
@@ -334,6 +333,7 @@ class Intro_Menu(Menu):
         self.blit_image('Tw1.jpg')
         self.blit_image('Sorceror.jpg')
         self.blit_image('hanging.jpg')
+        self.blit_image('hung.jpg')
 
     def update(self, inventory, world, player):
         if self.first_start:

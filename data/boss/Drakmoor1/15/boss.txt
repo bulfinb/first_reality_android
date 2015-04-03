@@ -3,7 +3,7 @@ Seifer
 130
 3
 3
-300/300
+300/100
 soldier.png
 Ruins0
 karate.ogg
