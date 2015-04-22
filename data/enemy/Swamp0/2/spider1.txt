@@ -1,7 +1,7 @@
 dragon1
 1
-37
-4
+65
+5
 5
 250/300
 spider.png

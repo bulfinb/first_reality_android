@@ -1,10 +1,11 @@
 import pygame
 from random import randint
 import os.path
+import pickle
 import globals as g
 from constants import *
 from text_box import TextBox
-from sounds import (attack, openc, damage, enemy_dead, ability,
+from sounds import (attack, gasp, openc, damage, enemy_dead, ability,
                     levelup, boss_defeated, boss_victory, explosion, buckfast)
 from parse import (
     load_npc_array,
@@ -90,6 +91,13 @@ class Player(object):
         self.menu = False
         self.position = None  # players position relative to objects
         self.facing = d  # (d,u,r,l) (down,up,right,left)
+        self.charged_sound = False
+        self.circular_attack = False
+        self.store_facing = None
+        self.store_going = None
+        self.charge_time = 0  # Charge up a spin attackd
+        self.charged = False
+        self.animate_circ_time = 0  # Timing used for animatoing circular attack
 
     def update(self, room, objects, current_time):
         # If the player is moving we need to check for collisions
@@ -141,6 +149,74 @@ class Player(object):
         text2.setText(str(enemy.health))
         pygame.display.flip()
         wait(self, 300)
+
+    def circular_attacking(self, objects, inventory):
+        # Blit sword slash to screen and the health of enemies and the player
+        if self.circular_attack:
+            objects.fighting = True
+            self.investigate = False
+            if g.time - self.animate_circ_time < 100:
+                attack.play()
+                self.facing = u
+                self.going = False
+                self.attack_image = self.attack_images[0]
+                self.attack_rect = self.attack_image.get_rect()
+                self.attack_rect.right = self.rect.right + 20
+                self.attack_rect.bottom = self.rect.top + 20
+                g.screen.blit(self.attack_image, self.attack_rect)
+
+            elif 200 > g.time-self.animate_circ_time > 100:
+                attack.play()
+                self.facing = r
+                self.attack_image = self.attack_images[1]
+                self.attack_rect = self.attack_image.get_rect()
+                self.attack_rect.left = self.rect.right - 5
+                self.attack_rect.bottom = self.rect.bottom + 8
+                g.screen.blit(self.attack_image, self.attack_rect)
+
+            elif 300 > g.time-self.animate_circ_time > 200:
+                attack.play()
+                self.facing = d
+                self.attack_image = self.attack_images[2]
+                self.attack_rect = self.attack_image.get_rect()
+                self.attack_rect.right = self.rect.right + 55
+                self.attack_rect.top = self.rect.bottom - 35
+                g.screen.blit(self.attack_image, self.attack_rect)
+
+            elif 400 > g.time-self.animate_circ_time > 300:
+                attack.play()
+                self.facing = l
+                self.attack_image = self.attack_images[3]
+                self.attack_rect = self.attack_image.get_rect()
+                self.attack_rect.right = self.rect.left + 5
+                self.attack_rect.bottom = self.rect.bottom + 8
+                g.screen.blit(self.attack_image, self.attack_rect)
+            else:
+                self.going = self.store_going
+                self.facing = self.store_facing
+                self.circular_attack = False
+                for enemy in objects.enemies:
+                    if enemy.health <= 0 and enemy != objects.boss:
+                        enemy_dead.play()
+                        inventory.exp -= enemy.strength*3
+                        objects.objects.remove(enemy)
+                        objects.enemies.remove(enemy)
+                        inventory.level_up()
+                    elif enemy.health <= 0 and enemy == objects.boss:
+                        inventory.exp -= enemy.strength*7
+                        enemy.defeat(g.time)
+                        inventory.level_up()
+                        objects.objects.remove(enemy)
+                        objects.enemies.remove(enemy)
+            text = TextBox(
+                (55, 30), (self.rect.left + 5, self.rect.top + 15), GREEN, fonts[0], 15)
+            text.setText(str(inventory.health[0]))
+            for enemy in objects.enemies:
+                if proximity(self, enemy, 17):
+                    text2 = TextBox(
+                        (55, 30), (enemy.rect.left + -10, enemy.rect.top - 10), RED, fonts[0], 15)
+                    text2.setText(str(enemy.health))
+            pygame.display.flip()
 
 
 class Npc(object):
@@ -388,7 +464,7 @@ class Enemy(object):
 
     def __init__(self, name):
         self.name = name                  # enemies's name
-        self.moving = False              # If True enemy follows random walk
+        self.moving = False              # If True enemy moves around
         self.going = False                # The direction the enemy is going in
         self.facing = d                   # The enemies faceing
         self.speed = 0                      # The enemies speed
@@ -403,12 +479,16 @@ class Enemy(object):
         self.next_update_time = 100*randint(0, 4)+30*randint(0, 3)
         self.go_around = False
         self.store = False
+        self.fighting = False
+        self.unfreeze = None
+        self.track = False
+        self.tracking = False
         # loads enemys of to the starting room
 
     def load(self, area, array):
         # given the array obtained from the text files that comes with each
         # enemy this loads the array and sets the enemies attributes
-        self.moving = array[1]
+        self.moving = bool(array[1])
         self.health = array[2]
         self.strength = array[3]
         self.speed = array[4]
@@ -440,15 +520,37 @@ class Enemy(object):
 
         self.next_update_time = current_time + 4000/self.speed
 
+    def enemy_attack(self, player, inventory, current_time):
+        # if there are enemies in the room
+        if self.next_attack_time < current_time and self.moving:
+            damage.play()
+            inventory.health[0] -= (4*self.strength*randint(5,
+                                                            9)+randint(1,
+                                                                       4))/(inventory.defence - inventory.counter/2)
+            if android:
+                android.vibrate(0.1)
+            self.next_attack_time = current_time + 500 + 200*randint(0, 5)
+            self.display_time = current_time + 600
+        if current_time < self.display_time:
+            text = TextBox(
+                (55, 30), (player.rect.left + 5, player.rect.top + 20), GREEN, fonts[0], 15)
+            text.setText(str(inventory.health[0]))
+            text2 = TextBox(
+                (55, 30), (self.rect.left - 10, self.rect.top - 10), RED, fonts[0], 15)
+            text2.setText(str(self.health))
+            damage_rect.top = player.rect.top + 2
+            damage_rect.left = player.rect.left + 15
+            g.screen.blit(damage_image, damage_rect)
+
     def update(self, area, objects, player, current_time):
-            # updates moving npcs
-        if self.moving:
+        # updates moving npcs
+        if self.moving is True:
             # check collisions with maps
             if (self.going and collision_room(self, area, 10)):
                 self.going = False
             # next check for collisions with objects
             elif self.going:
-                if collision_map(self, area, 10) and self.go_around == False:
+                if collision_map(self, area, 10) and self.go_around == False and self.fighting == False and self.tracking == True:
                     self.try_go_around(current_time)
 
                 elif collision_map(self, area, 10):
@@ -457,13 +559,15 @@ class Enemy(object):
                 else:
                     for a in objects:
                         if collision_ob(self, a, 12):
-                            if self.go_around == False:
+                            if self.go_around == False and self.fighting == False and self.tracking == True:
                                 self.try_go_around(current_time)
                                 break
                             else:
                                 self.going = False
+                                self.track = False
                     if collision_ob(self, player, 12):
                         self.going = False
+                        self.track = False
             # function to control sprite switching, movement and collisions
             control_ob(
                 self,
@@ -478,33 +582,22 @@ class Enemy(object):
                 self.going = self.store
                 self.next_update_time = current_time + 4000/self.speed
 
-            if self.next_update_time < current_time:
+            elif self.next_update_time < current_time and self.fighting == False and self.tracking == True and self.track == False:
                 self.go_around = False
-                track(self, player)
+                self.track = True
                 self.facing = self.going
+                self.next_update_time = current_time + 300
+            elif self.track and self.next_update_time < current_time:
+                track(self, player)
                 self.next_update_time = current_time + 2000/self.speed
-                # seperates times at which npc randomly decide to move by 0.4
-                # seconds
 
-    def enemy_attack(self, player, inventory, current_time):
-        # if there are enemies in the room
-        if self.next_attack_time < current_time:
-            damage.play()
-            inventory.health[0] -= (4*self.strength*randint(5, 8)+randint(1, 4))/inventory.defence
-            if android:
-                android.vibrate(0.1)
-            self.next_attack_time = current_time + 1200
-            self.display_time = current_time + 600
-        if current_time < self.display_time:
-            text = TextBox(
-                (55, 30), (player.rect.left + 5, player.rect.top + 20), GREEN, fonts[0], 15)
-            text.setText(str(inventory.health[0]))
-            text2 = TextBox(
-                (55, 30), (self.rect.left - 10, self.rect.top - 10), RED, fonts[0], 15)
-            text2.setText(str(self.health))
-            damage_rect.top = player.rect.top + 2
-            damage_rect.left = player.rect.left + 15
-            g.screen.blit(damage_image, damage_rect)
+            elif self.next_update_time < current_time:
+                self.next_update_time = current_time + 4000/self.speed
+                self.going = randint(1, 4)
+            self.fighting = False
+
+        elif self.unfreeze < current_time and self.moving is False:
+            self.moving = True
 
     def animate_ability(self):
         text2 = TextBox(
@@ -621,13 +714,33 @@ class story_object(object):
                 if self.new_area != 'Credits' or len(self.dialogues[i]) != 2:
                     # fades out every image except for the final one
                     fade_black(1000)
-            player.investigate = False
-            player.rect.topleft = [g.xsize/2, g.ysize/2]
             if self.new_area == 'Credits':
                 inventory.credits = True
             else:
                 area.change_area(self.new_area)
                 area.room_change = True
+                text = TextBox(
+                    (165, 45), (410, 300), (200, 20, 20), fonts[0], 24)  # Display Game Saved!
+                text.setText('Auto Save!')
+                pygame.display.update()     # Blit Game Saved
+                inventory.save_game()
+                pickle.dump(
+                    area.name,
+                    open(
+                        os.path.join(
+                            'data',
+                            "save_game_area.p"),
+                        "wb"))  # Save the area
+                pickle.dump(
+                    area.chests,
+                    open(
+                        os.path.join(
+                            'data',
+                            "save_game_chests.p"),
+                        "wb"))  # Save the state of chests
+                pygame.time.wait(1000)
+                player.investigate = False
+                player.rect.topleft = [g.xsize/2, g.ysize/2]
 
         else:
             boxposx = 28+randint(0, 1)*(g.xsize-576)
@@ -656,6 +769,7 @@ class Boss(Enemy):
         Enemy.__init__(self, name)
         self.defeated = False
         self.next_sound_time = 0
+        self.tracking = True
 
     def load(self, area, array):
         Enemy.load(self, area, array)
@@ -673,6 +787,7 @@ class Boss(Enemy):
 
     def load_spawn(self, area, array):
         self.spawn = Enemy('spawn')
+        self.spawn.tracking = True
         self.spawn.load(area, array)
         self.spawn_health = self.spawn.health
         self.next_spawn_time = 0
@@ -733,6 +848,7 @@ class Interactable_Objects(object):
         self.next_update_time = 0
         self.next_fight_time = 0
         self.ability_animate_time = 0
+        self.next_freeze_time = 0
         self.fighting = False
         # list of objects, all objects in a room are loaded to this list when player enters room
         self.objects = []  # Used to detec collisons between objects and players
@@ -742,6 +858,7 @@ class Interactable_Objects(object):
         self.chests = []
         self.stories = []
         self.boss = False
+        self.lock_on_time = 0
         # used store where the player is with respect to the object: u, d, l, or r
 
     def load_Npcs(self, area):
@@ -841,10 +958,29 @@ class Interactable_Objects(object):
         self.fighting = False
         for enemy in self.enemies:
                 # first check if player is close to an enemy and if that object is an enemy
+            if player.charged is True and proximity(player, enemy, 17):
+                self.next_fight_time = current_time + \
+                    ((12 + 3*randint(0, 6))*inventory.stats[5].quantity)
+                self.fighting = True
+                player.charged = False
+                player.circular_attack = True
+                player.animate_circ_time = g.time
+                player.store_facing = player.facing
+                player.store_going = player.going
+                for enemy in self.enemies:
+                    if proximity(player, enemy, 17):
+                        enemy.health -= (inventory.attack*randint(3, 7)+randint(0, 4))/4
+                if android:
+                    android.vibrate(0.2)
+                break
+
+            player.circular_attacking(self, inventory)
+
             if proximity(player, enemy, 15):
                 if (current_time > self.next_fight_time
                    and fight_enemy(player, enemy)):
-                    self.next_fight_time = current_time + 24*inventory.stats[5].quantity
+                    self.next_fight_time = current_time + \
+                        ((12 + 3*randint(0, 6))*inventory.stats[5].quantity)
                     # damages the enemy
                     attack.play()
                     player.animate_attack(enemy, inventory)   # Animate players attack
@@ -858,10 +994,10 @@ class Interactable_Objects(object):
                         self.enemies.remove(enemy)
                         inventory.level_up()
                     elif enemy.health <= 0 and enemy == self.boss:
-                        if android:
-                            android.vibrate(1.2)
                         inventory.exp -= enemy.strength*7
                         enemy.defeat(current_time)
+                        if android:
+                            android.vibrate(1.2)
                         inventory.level_up()
                         self.objects.remove(enemy)
                         self.enemies.remove(enemy)
@@ -873,14 +1009,20 @@ class Interactable_Objects(object):
     def ability_fight(self, area, player, inventory, current_time):
         """Fight using ability. Only works when no enemies are in Melee range.
         Can hit multiple enemies"""
-        if self.fighting is False and current_time > self.next_fight_time and player.investigate is True:
+        if self.fighting is False and current_time > self.next_freeze_time:
             self.hit_enemies = []
             for enemy in self.enemies:
-                if proximity(player, enemy, 15+3+inventory.ability.power*9):
+                if proximity(player, enemy, 15+5+inventory.ability.power*7):
                     self.next_fight_time = current_time + 24*inventory.stats[5].quantity
                     self.ability_animate_time = current_time + 600
                     self.hit_enemies.append(enemy)
                     enemy.health -= (inventory.confidence*randint(3, 6)+randint(0, 4))/4
+                    enemy.moving = False
+                    enemy.next_attack_time = current_time + 1600 + 200*randint(1, 6)
+                    enemy.unfreeze = enemy.next_attack_time - 200
+                    self.next_freeze_time = current_time + 3500 + 600*randint(0, 4)
+                    if android:
+                        android.vibrate(0.1)
                     ability.play()
                     player.investigate = False
                     if enemy.health <= 0 and enemy != self.boss:
@@ -905,6 +1047,13 @@ class Interactable_Objects(object):
             for enemy in self.hit_enemies:
                 enemy.animate_ability()
 
+    def enemy_lock_on(self, player, current_time):
+        if self.lock_on_time < current_time:
+            self.lock_on_time = current_time + 500
+            for enemy in self.enemies:
+                if enemy.tracking is False and proximity(player, enemy, 300):
+                    enemy.tracking = True
+
     def pop_up_text(self, player, area, current_time):
         for text_dis in self.text_dis:
             # If we approach the object, start interacting
@@ -920,21 +1069,29 @@ class Interactable_Objects(object):
             text_dis.interact(current_time, area)
 
     def interact_npc_chest_story(self, player, inventory, area):
-        if player.investigate is True:
+        if player.investigate is True and self.fighting is False:
             # If the player is investigating check check for interactions with npc's or chests
 
             for npc in self.npcs:
                 if talk_npc(player, npc):
                     npc.interact(area, player, inventory)
+                    player.charge_time = g.time + 4000
+                    player.charged = False
+                    break
 
             for chest in self.chests:
-                if open_chest(player, chest):
+                if open_chest(player, chest) and player.investigate:
                     chest.interact(area, inventory, player)
+                    player.charge_time = g.time + 4000
+                    player.charged = False
+                    break
 
             for story in self.stories:
-                if talk_npc(player, story):
+                if talk_npc(player, story) and player.investigate:
                     player.going = False
                     story.interact(area, player, inventory)
+                    player.charge_time = g.time + 4000
+                    player.charged = False
 
     def update(self, area, player, current_time):
         """if we change rooms, loads up the new objects, otherwise just updates the
@@ -965,6 +1122,7 @@ class Interactable_Objects(object):
                 if current_time > self.boss.victory_time:
                     self.boss.victory(area, player, current_time)
                     self.boss = False
+        self.enemy_lock_on(player, current_time)
         self.melee_fight(area, player, inventory, current_time)
         self.ability_fight(area, player, inventory, current_time)
         # Then pop up text

@@ -1,7 +1,7 @@
 dragon1
 1
 300
-4
+8
 8
 32/650
 robotboss.png

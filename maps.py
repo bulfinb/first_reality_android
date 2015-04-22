@@ -91,6 +91,7 @@ class Area_map(pygame.sprite.Sprite):
                     # sets the current room
                     self.current_room = door[0]
                     self.load_room()
+                    player.charged = False
 
                     # reposition player and map if the room changes
                     for door in self.doors:

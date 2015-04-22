@@ -17,6 +17,7 @@ global exit_menu_on  # Exit menu on or off used in pc version
 global boss_defeated # Used in Android version to stop music after a boss has been Vanquished
 global mouse_position # Used for investigating npc's and story objects
 global current_area
+global time
 width = pygame.display.Info().current_w
 height = pygame.display.Info().current_h
 if android:
@@ -52,5 +53,5 @@ mouse = True
 fullscreen = False
 exit_menu_on = False
 boss_defeated = False
-mouse_position = None
+mouse_position = [0,0]
 current_area = None

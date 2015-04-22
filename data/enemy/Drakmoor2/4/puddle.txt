@@ -1,7 +1,7 @@
 dragon1
 1
-37
-4
+50
+5
 5
 280/280
 puddle.png

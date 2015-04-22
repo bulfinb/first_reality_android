@@ -40,6 +40,9 @@ class Menu(object):
         self.choice = None
         self.touch_ypos = 0
         self.touched = False
+        self.choice = None
+        self.charge_time = 0 # used to avoid bug
+        self.charged = None
 
     def menu_control(self, choices, x_pos, y_pos, color):
         # if it is not yet positioned, icon is postion in top left hand corner:

@@ -376,7 +376,7 @@ class Inventory(object):
                 break
 
     def level_up(self):
-        if self.exp <= 0 and self.counter <= 10:
+        if self.exp <= 0 and self.counter <= 12:
             self.counter += 1
             self.exp = 30 + 50*self.counter + 5*self.counter ^ 2
             self.stats[0].quantity += 1
@@ -525,7 +525,7 @@ class Inventory_Menu(Menu):
         """When armor accessories or weapons is selected we want to blit the current
         Equiped Items to the screen with a headine 'Equiped'"""
         text = TextBox((240, 40), (0, 40), self.color, fonts[0], 24)  # Heading
-        text.setText('Equiped')
+        text.setText('Equipped')
         # finds which weapon is equipped and diplays it
         text = TextBox((150, 35), (0, 80), self.color, fonts[0], 20)   # Weapon
         text.setText(inventory.weapon.name)
@@ -626,8 +626,8 @@ class Inventory_Menu(Menu):
         inventory.update_equipment()                # update inventory
         self.blit_equipment(inventory)              # Blit new equipment
         text = TextBox(
-            (120, 45), (450, 200), (100, 100, 100), fonts[0], 24)  # Display Equiped!
-        text.setText('Equiped!')
+            (130, 45), (450, 200), (100, 100, 100), fonts[0], 24)  # Display Equiped!
+        text.setText('Equipped!')
         pygame.display.update()     # Blit equiped! to the screen and then wait for 0.6 seconds
         pygame.time.wait(600)
         self.investigate = False    # required to exit space loop

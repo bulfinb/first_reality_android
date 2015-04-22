@@ -3,5 +3,5 @@ dragon1
 37
 2
 8
-100/150
+100/550
 greenguy.png

@@ -1,7 +1,7 @@
 dragon1
 1
 350
-7
+9
 5
 596/370
 Lred_dragon.png

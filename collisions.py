@@ -16,6 +16,16 @@ def proximity(ob1, ob2, distance):
 def talk_npc(player, npc):
     # if player is close to the npc check
     if proximity(player, npc, 30) is True and abs(g.mouse_position[0] - npc.rect.center[0]) < 94 and abs(g.mouse_position[1] - npc.rect.center[1]) < 94:
+        if abs(player.rect.center[0] - npc.rect.center[0]) > abs(player.rect.center[1] - npc.rect.center[1]):
+            if player.rect.center[0] - npc.rect.center[0] > 0:
+                player.position = r
+            else:
+                player.position = l
+        else:
+            if player.rect.center[1] - npc.rect.center[1] > 0:
+                player.position = d
+            else:
+                player.position = u
         # if ist below on the right or left and if its facing the npc return True
         return True
 
@@ -68,21 +78,21 @@ def collision_ply(ply, ob, gap):
     # player collisions are slightly different in that goin up player can partly cover an object
     # returns true if ply has collided ob used to stop objects from moving
     # uses distance 'gap' to seperat objects. Most seperation in motion dir
-    if (ply.going == u and ob.rect.right + gap/5 > ply.rect.left
-            and ply.rect.right > ob.rect.left-gap/5
+    if (ply.going == u and ob.rect.right + gap/3 > ply.rect.left
+            and ply.rect.right > ob.rect.left-gap/3
             and ob.rect.bottom-gap*2 < ply.rect.center[1] < ob.rect.bottom):
         return True
-    elif (ply.going == r and ob.rect.center[1] - 2*gap > ply.rect.top
-          and ply.rect.bottom > ob.rect.top-gap/5
+    elif (ply.going == r and ob.rect.bottom -gap*2  > ply.rect.center[1]
+          and ply.rect.bottom > ob.rect.top-gap/2
           and ob.rect.left-gap < ply.rect.right < ob.rect.left+2*gap):
         return True
-    elif (ply.going == l and ob.rect.center[1] - 2*gap > ply.rect.top
-          and ply.rect.bottom > ob.rect.top-gap/5
+    elif (ply.going == l and ob.rect.bottom -gap*2  > ply.rect.center[1]
+          and ply.rect.bottom > ob.rect.top-gap/2
           and ob.rect.right-2*gap < ply.rect.left < ob.rect.right+gap):
         return True
-    elif (ply.going == d and ob.rect.right + gap/5 > ply.rect.left
-          and ply.rect.right > ob.rect.left-gap/5
-          and ob.rect.top+gap > ply.rect.bottom > ob.rect.top-gap):
+    elif (ply.going == d and ob.rect.right + gap/3 > ply.rect.left
+          and ply.rect.right > ob.rect.left-gap/3
+          and ob.rect.top+2*gap > ply.rect.bottom > ob.rect.top-gap):
         return True
 
 
@@ -125,12 +135,12 @@ def collision_map(ob, room, gap):
 
 def collision_door(player, door, room, gap):
     # detects if a player walks through a door
-    if door[3] == u or door[3] == d:
+    if (door[3] == u or door[3] == d) and player.circular_attack is False:
         if ((player.going == door[3] or player.facing == door[3])
            and door[1] - 2*gap < player.rect.center[0] - room.rect.left < door[1] + 2*gap
            and door[2] - gap < player.rect.center[1] - room.rect.top < door[2] + gap):
             return True
-    elif door[3] == l or door[3] == r:
+    elif (door[3] == l or door[3] == r) and player.circular_attack is False:
         if ((player.going == door[3] or player.facing == door[3])
            and door[1] - gap < player.rect.center[0] - room.rect.left < door[1] + gap
            and door[2] - 2*gap < player.rect.center[1] - room.rect.top < door[2] + 2*gap):
@@ -166,7 +176,7 @@ def track_mouse(player, mouse_pos):
             player.facing = d
         else:
             player.going = False
-    else:
+    elif mouse_pos[0] != 0:
         player.going = False
 
 

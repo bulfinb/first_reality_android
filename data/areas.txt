@@ -1,4 +1,6 @@
 Dukedum0
+Twilight0
+Dukedum9
 Dukedum1
 Tower1
 Drakmoor1
@@ -6,7 +8,6 @@ Dukedum6
 Dukedum4
 Dukedum3
 Dukedum2
-Twilight0
 Twilight1
 Tower0
 Dukedum11
@@ -21,6 +22,5 @@ Dukedum8
 Drakmoor2
 Ruins2
 Drakmoor0
-Dukedum9
 Ruins1
 Ruins2

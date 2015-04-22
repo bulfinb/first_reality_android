@@ -42,8 +42,8 @@ next_update_time = 0
 
 while True:
     """ This is the main game loop. There are sub game loops like the inventory menu"""
-    time = pygame.time.get_ticks()
-    if next_update_time < time:
+    g.time = pygame.time.get_ticks()
+    if next_update_time < g.time:
         if android:
             if android.check_pause():
                 mixer.music.pause()
@@ -51,11 +51,11 @@ while True:
                 mixer.music.unpause()
 #            elif mixer.music.get_busy() == False and g.boss_defeated == False and world.name != 'Tower0':
 #                mixer.music.play(-1)
-        next_update_time = time + 30
+        next_update_time = g.time + 30
         control_events(myplayer, world, inter_objects.objects)
-        world.change_rooms(myplayer, time, g.ysize, g.xsize)
-        myplayer.update(world, inter_objects.objects, time)
-        inter_objects.update(world, myplayer, time)
+        world.change_rooms(myplayer, g.time, g.ysize, g.xsize)
+        myplayer.update(world, inter_objects.objects, g.time)
+        inter_objects.update(world, myplayer, g.time)
         inventory_menu.update(myplayer, myinventory, world)
         intro_menu.game_over(myinventory, world, myplayer, inter_objects)
         exit_menu.update()
@@ -66,7 +66,6 @@ while True:
         for a in inter_objects.objects:
             g.screen.blit(a.image, a.rect)
         g.screen.blit(myplayer.image, myplayer.rect)
-        inter_objects.interact_objects(myplayer, world, myinventory, time)
+        inter_objects.interact_objects(myplayer, world, myinventory, g.time)
         pygame.display.flip()
-        time2 = pygame.time.get_ticks()
     pygame.time.wait(4)  # Used to limit cpu usage

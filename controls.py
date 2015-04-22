@@ -2,6 +2,7 @@ import pygame
 import globals as g
 from pygame.locals import *
 from constants import *
+from sounds import gasp
 from text_box import TextBox
 from collisions import collision_map, collision_ob, collision_room, track_mouse, track_mouse_menu, face_mouse
 try:
@@ -18,16 +19,34 @@ except ImportError:
 def control_events(p, amap, interobjects):
     # Controls the player checks what buttons were pressed and sets the
     # players attributes accordingly
+    if abs(p.rect.center[0]-g.mouse_position[0]) < 50 and abs(p.rect.center[1] - g.mouse_position[1]) < 50 and g.mouse_position[0] !=0:
+        if g.time - p.charge_time > 1800 and p.charged_sound is False:
+            p.charged_sound = True
+            p.charged = True
+            gasp.play()
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             exit()
-        elif event.type == pygame.MOUSEBUTTONDOWN:
+        if event.type == pygame.MOUSEBUTTONDOWN:
             if event.button == 1 and abs(p.rect.center[0]-event.pos[0]) < 150 and abs(p.rect.center[1] - event.pos[1]) < 150:
                 face_mouse(p, event.pos)
                 p.investigate = True
                 g.mouse_position = event.pos
+            if event.button == 1 and abs(p.rect.center[0]-event.pos[0]) < 50 and abs(p.rect.center[1] - event.pos[1]) < 50:
+                p.charged_sound = False
+                p.charge_time = g.time
+                g.mouse_position = event.pos
         if event.type == pygame.MOUSEMOTION:
             track_mouse(p, event.pos)
+            #if (event.pos[0]==0 and event.pos[1]== 0 and p.charged is False and
+            #    abs(p.rect.center[0]-g.mouse_position[0]) < 50 and
+            #    abs(p.rect.center[1] - g.mouse_position[1]) < 50 and g.mouse_position[0] !=0):
+            #    if g.time - p.charge_time > 1800:
+            #        p.charged = True
+            if (abs(p.rect.center[0]-g.mouse_position[0]) > 50 and
+                abs(p.rect.center[1] - g.mouse_position[1]) > 50 and g.mouse_position[0] !=0):
+                p.charge_time = g.time
+            g.mouse_position = event.pos
 
         elif event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
@@ -67,6 +86,8 @@ def space_loop(p):
     # used to lock computer in sub loop and stop game from running. Example is
     # while talking to npc it stops updates etc
     while p.investigate is False:
+        g.time = pygame.time.get_ticks()
+        p.charged_time = g.time
         if android:
             if android.check_pause():
                 mixer.music.pause()
@@ -90,11 +111,16 @@ def wait(player, time):
     for i in range(0, time/100):
         pygame.time.wait(100)
         control_events_menu(player, g.xsize, g.ysize)
-    if android:
-        if android.check_pause():
-            mixer.music.pause()
-            android.wait_for_resume()
-            mixer.music.unpause()
+        g.time = pygame.time.get_ticks()
+        player.charged_time = g.time
+        if player.menu is True:
+            player.menu = False
+            break
+        if android:
+            if android.check_pause():
+                mixer.music.pause()
+                android.wait_for_resume()
+                mixer.music.unpause()
 
 
 def control_player(player, inter_objects, amap, current_time):

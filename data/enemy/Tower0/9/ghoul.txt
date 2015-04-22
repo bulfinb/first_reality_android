@@ -1,7 +1,7 @@
 dragon1
 1
 340
-7
+9
 5
 466/566
 Lyellow_dragon.png

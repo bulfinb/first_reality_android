@@ -1,4 +1,4 @@
 0
 0
 50/100
-Norman automatically attacks enemies if he is facing them.
+Norman automatically attacks enemies that approach him.
